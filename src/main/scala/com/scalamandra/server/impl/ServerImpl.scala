@@ -1,14 +1,19 @@
 package com.scalamandra.server.impl
 
-import akka.actor.ActorSystem
+import akka.actor.typed.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.util.FastFuture
 import com.scalamandra.config.{ApiConfig, ServerConfig}
 import com.scalamandra.controller.Controller
+import com.scalamandra.logging.ServerLogger
 import com.scalamandra.server.Server
-import sttp.tapir.server.akkahttp.AkkaHttpServerInterpreter
+import com.scalamandra.utils.Blocker
+import sttp.tapir.model.ServerRequest
+import sttp.tapir.server.akkahttp.{AkkaHttpServerInterpreter, AkkaHttpServerOptions}
 import sttp.tapir.swagger.bundle.SwaggerInterpreter
 
+import java.io.File
+import java.nio.file.Files
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -17,9 +22,27 @@ class ServerImpl(
                   apiConfig: ApiConfig,
                   controllers: List[Controller],
                 )(implicit
-                  actorSystem: ActorSystem,
-                  ec: ExecutionContext) extends Server {
+                  val actorSystem: ActorSystem[_],
+                  ec: ExecutionContext) extends Server with Blocker {
   import serverConfig._
+
+  def createTempFile(request: ServerRequest): Future[File] =
+    blocking {
+      Files.createTempFile("tapir", "tmp").toFile
+    }
+
+  def deleteFile(file: File): Future[Unit] =
+    blocking {
+      Files.delete(file.toPath)
+    }
+
+  def serverOptions: AkkaHttpServerOptions = AkkaHttpServerOptions(
+    createFile = createTempFile,
+    deleteFile = deleteFile,
+    interceptors = List(
+      AkkaHttpServerOptions.Log.serverLogInterceptor(new ServerLogger())
+    )
+  )
 
   override def start(): Future[Unit] = {
     val endpoints = controllers.flatMap(_.endpoints)
@@ -30,7 +53,11 @@ class ServerImpl(
         apiConfig.version,
       )
     } else List.empty
-    val routes = AkkaHttpServerInterpreter().toRoute(endpoints ++ docs)
+
+    val routes = AkkaHttpServerInterpreter(
+      serverOptions
+    ).toRoute(endpoints ++ docs)
+
     Http().newServerAt(host, port)
       .bind(routes)
       .transformWith {
