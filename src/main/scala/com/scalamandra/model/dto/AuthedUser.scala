@@ -1,9 +1,12 @@
-package com.scalamandra.model
+package com.scalamandra.model.dto
 
 import com.scalamandra.serialization._
 
 case class AuthedUser(
+                       id: Long,
+                       nickname: String,
                        email: String,
+                       avatarUrl: Option[String],
                      )
 object AuthedUser {
 

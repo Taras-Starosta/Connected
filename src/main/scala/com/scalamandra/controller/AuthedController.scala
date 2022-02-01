@@ -3,8 +3,8 @@ package com.scalamandra.controller
 import akka.http.scaladsl.util.FastFuture
 import com.scalamandra.config.AuthConfig
 import com.scalamandra.controller.AuthedController.invalidJwt
-import com.scalamandra.model.AuthedUser
 import com.scalamandra.model.HttpException._
+import com.scalamandra.model.dto.AuthedUser
 import com.scalamandra.serialization._
 import pdi.jwt._
 import sttp.model.StatusCode
