@@ -30,6 +30,7 @@ libraryDependencies ++= Seq(
   scribeDep(),
   scribeDep("file"),
   scribeDep("slf4j"),
+  "com.github.dwickern" %% "scala-nameof" % "4.0.0" % "provided",
 )
 
 enablePlugins(UniversalPlugin)

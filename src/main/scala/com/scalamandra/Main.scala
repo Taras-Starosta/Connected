@@ -2,9 +2,11 @@ package com.scalamandra
 
 import akka.actor.typed.{ActorSystem, SpawnProtocol}
 import akka.http.scaladsl.util.FastFuture
+import cats.effect.IO
 import com.scalamandra.config._
 import com.scalamandra.logging.LoggerConfigurator
 import com.scalamandra.server.impl.ServerImpl
+import doobie._
 import pureconfig._
 import pureconfig.error.ConfigReaderException
 
@@ -28,11 +30,17 @@ object Main {
     implicit val actorSystem: ActorSystem[SpawnProtocol.Command] = ActorSystem(SpawnProtocol(), "Connected")
     LoggerConfigurator()
     implicit val ec: ExecutionContext = actorSystem.executionContext
-    val helloWorld = new HelloWorldController
     val bootstrap = for {
       serverConfig <- loadConfig[ServerConfig]("server")
       apiConfig <- loadConfig[ApiConfig]("api")
-      _ <- new ServerImpl(serverConfig, apiConfig, List(helloWorld)).start()
+      dbConf <- loadConfig[DatabaseConfig]("database")
+      xa = Transactor.fromDriverManager[IO](
+        driver = dbConf.driver,
+        url = dbConf.url,
+        user = dbConf.user,
+        pass = dbConf.password,
+      )
+      _ <- new ServerImpl(serverConfig, apiConfig, List()).start()
     } yield ()
     bootstrap.recover {
       case NonFatal(exc) =>

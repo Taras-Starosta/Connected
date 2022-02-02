@@ -32,4 +32,8 @@ object HttpException {
       CantBeDeserialized,
     )
 
+  sealed abstract class Conflict(reason: String) extends HttpException(StatusCode.Conflict, reason)
+
+  case object UserAlreadyExists extends Conflict("User already exists.")
+
 }
