@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+  backend:
+    image: connected-app
+    restart: always
+    ports:
+      - "127.0.0.1:9000:9000"
+    environment:
+      PSQL_URL: jdbc:postgresql://psql:5432/connected-db
+      PSQL_USER: connected-admin
+      PSQL_PASSWORD: Str0ngP@ss_Ul1!Ul1!
+
+  psql:
+    image: postgres
+    restart: always
+    ports:
+      - "127.0.0.1:5432:5432"
+    environment:
+      POSTGRES_DB: connected-db
+      POSTGRES_USER: connected-admin
+      POSTGRES_PASSWORD: Str0ngP@ss_Ul1!Ul1!
