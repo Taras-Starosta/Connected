@@ -37,3 +37,7 @@ libraryDependencies ++= Seq(
 )
 
 enablePlugins(UniversalPlugin)
+
+scalacOptions ++= Seq(
+  "-deprecation"
+)

@@ -13,8 +13,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class ServerLogger(implicit val actorSystem: ActorSystem[_])
   extends ServerLog[Future] with Blocker {
 
-  implicit val ec: ExecutionContext =
-
   private def showResponse(response: ServerResponse[_]): String = {
     s"Response:\n\tStatus code: ${response.statusText}\n\tHeaders: ${Headers.toStringSafe(response.headers)}\n\tBody: ${response.body.getOrElse("<empty body>")}"
   }

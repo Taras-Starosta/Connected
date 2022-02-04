@@ -7,8 +7,10 @@ import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams
 import sttp.tapir.server.ServerEndpoint
 import sttp.tapir._
+import sttp.tapir.typelevel.ErasureSameAsType
 
 import scala.concurrent.Future
+import scala.reflect.ClassTag
 
 trait Controller extends uPickleTapir {
 
@@ -20,8 +22,8 @@ trait Controller extends uPickleTapir {
 
   def endpoints: List[Endpoint]
 
-  protected final def oneOfHttp[T <: HttpException](value: T)
-                                                   (implicit ev: Codec[String, T, CodecFormat.TextPlain]): EndpointOutput.OneOfVariant[T] =
+  protected final def oneOfHttp[T <: HttpException: ClassTag: ErasureSameAsType](value: T)
+                                                                                (implicit ev: Codec[String, T, CodecFormat.TextPlain]): EndpointOutput.OneOfVariant[T] =
     HttpException.oneOfHttp(value)
 
 }

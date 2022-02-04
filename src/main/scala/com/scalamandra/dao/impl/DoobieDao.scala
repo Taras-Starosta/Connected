@@ -37,7 +37,7 @@ trait DoobieDao {
   }
 
   protected final def transact[T](body: => ConnectionIO[T]): Future[T] =
-    body.transact(xa).unsafeToFuture
+    body.transact(xa).unsafeToFuture()
 
   protected final def insert[T: Read](fields: Seq[String])(sql: => Fragment): Future[T] =
     transact {

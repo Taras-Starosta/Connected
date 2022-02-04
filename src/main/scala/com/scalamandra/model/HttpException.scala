@@ -3,9 +3,11 @@ package com.scalamandra.model
 import akka.http.scaladsl.util.FastFuture
 import sttp.model.StatusCode
 import sttp.tapir.Codec.PlainCodec
+import sttp.tapir.typelevel.ErasureSameAsType
 import sttp.tapir.{Codec, CodecFormat, DecodeResult, EndpointOutput}
 
 import scala.concurrent.Future
+import scala.reflect.ClassTag
 
 sealed abstract class HttpException(
                                      val statusCode: StatusCode,
@@ -14,8 +16,8 @@ sealed abstract class HttpException(
                                    ) extends Exception(message, reason)
 object HttpException {
 
-  final def oneOfHttp[T <: HttpException](value: T)
-                                         (implicit ev: Codec[String, T, CodecFormat.TextPlain]): EndpointOutput.OneOfVariant[T] = {
+  final def oneOfHttp[T <: HttpException: ClassTag: ErasureSameAsType](value: T)
+                                                                      (implicit ev: Codec[String, T, CodecFormat.TextPlain]): EndpointOutput.OneOfVariant[T] = {
     import sttp.tapir._
     oneOfVariant(
       statusCode(value.statusCode)

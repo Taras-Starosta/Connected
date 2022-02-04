@@ -18,6 +18,6 @@ trait Blocker {
 object Blocker {
 
   def blockingEC(implicit actorSystem: ActorSystem[_]): ExecutionContext =
-    actorSystem.dispatchers.lookup(DispatcherSelector.blocking)
+    actorSystem.dispatchers.lookup(DispatcherSelector.blocking())
 
 }

@@ -109,11 +109,11 @@ class MailerImpl(emailConfig: EmailConfig)
           FastFuture.failed(exc)
       }
 
-      val blocking = blocking {
+      val send = blocking {
         Transport.send(message)
       }
 
-      maybeError.flatMap(_ => blocking)
+      maybeError.flatMap(_ => send)
     }
 
   }
