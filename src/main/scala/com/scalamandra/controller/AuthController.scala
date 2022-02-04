@@ -23,6 +23,7 @@ class AuthController(
       register,
       login,
       refresh,
+      activate,
     )
 
   val basePath: EndpointInput[Unit] = version / "auth"
