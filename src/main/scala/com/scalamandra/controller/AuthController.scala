@@ -1,8 +1,9 @@
 package com.scalamandra.controller
 
 import com.scalamandra.config.ApiConfig
-import com.scalamandra.model.HttpException.{Conflict, InvalidCredentials, Unauthorized, UserAlreadyExists}
-import com.scalamandra.model.dto.{LoginRequest, LoginResponse, RefreshRequest, RefreshResponse, RegisterRequest}
+import com.scalamandra.model.HttpException
+import com.scalamandra.model.HttpException._
+import com.scalamandra.model.dto.auth._
 import com.scalamandra.provider.AuthProvider
 import com.scalamandra.service.AuthService
 import pdi.jwt.JwtClaim
@@ -27,7 +28,7 @@ class AuthController(
   val basePath: EndpointInput[Unit] = version / "auth"
 
   def register: Endpoint =
-    endpoint.put
+    endpoint.post
       .description("Registration")
       .errorOut(oneOf[Conflict](oneOfHttp(UserAlreadyExists)))
       .in(basePath / "register")
@@ -54,5 +55,16 @@ class AuthController(
       .serverLogic { u => r =>
         authService.refresh(u, r)
       }
+
+  def activate: Endpoint =
+    endpoint.patch
+      .description("Activate user")
+      .errorOut(oneOf[NotFound](oneOfHttp(ConfirmationNotFound)))
+      .in(basePath / "activate")
+      .in(
+        query[String]("token") and query[Long]("user_id")
+      )
+      .mapInTo[ActivationRequest]
+      .serverLogic(authService.activate)
 
 }

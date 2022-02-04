@@ -1,4 +1,4 @@
-package com.scalamandra.model.dto
+package com.scalamandra.model.dto.auth
 
 import com.scalamandra.serialization._
 

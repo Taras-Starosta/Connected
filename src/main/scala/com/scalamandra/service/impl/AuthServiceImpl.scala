@@ -2,9 +2,10 @@ package com.scalamandra.service.impl
 
 import com.scalamandra.dao.{TokenDao, UserDao}
 import com.scalamandra.integration.Mailer
-import com.scalamandra.model.HttpException.{Conflict, InvalidCredentials, Unauthorized, UserAlreadyExists}
+import com.scalamandra.model.HttpException
+import com.scalamandra.model.HttpException.{ConfirmationNotFound, Conflict, InvalidCredentials, Unauthorized, UserAlreadyExists}
 import com.scalamandra.model.db.User
-import com.scalamandra.model.dto.{AuthedUser, LoginRequest, LoginResponse, RefreshRequest, RefreshResponse, RegisterRequest}
+import com.scalamandra.model.dto.auth._
 import com.scalamandra.provider.{AuthProvider, BCryptProvider, TokenProvider}
 import com.scalamandra.service.AuthService
 import pdi.jwt.JwtClaim
@@ -73,5 +74,11 @@ class AuthServiceImpl(
         )
       )
     } else Left(InvalidCredentials)
+
+  override def activate(request: ActivationRequest): Future[Either[HttpException.NotFound, Unit]] =
+    for {
+      success <- tokenDao.confirm(request.userId, request.token)
+    } yield if(success) Right(())
+      else Left(ConfirmationNotFound)
 
 }

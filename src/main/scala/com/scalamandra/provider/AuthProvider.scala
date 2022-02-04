@@ -2,7 +2,7 @@ package com.scalamandra.provider
 
 import com.scalamandra.model.HttpException
 import com.scalamandra.model.db.User
-import com.scalamandra.model.dto.AuthedUser
+import com.scalamandra.model.dto.auth.AuthedUser
 import sttp.tapir.EndpointOutput.OneOfVariant
 import sttp.tapir.server.PartialServerEndpoint
 

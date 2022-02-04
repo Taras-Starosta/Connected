@@ -5,8 +5,8 @@ import com.scalamandra.model.HttpException
 import com.scalamandra.serialization.uPickleTapir
 import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams
-import sttp.tapir.server.ServerEndpoint
 import sttp.tapir._
+import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.typelevel.ErasureSameAsType
 
 import scala.concurrent.Future

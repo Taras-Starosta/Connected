@@ -8,7 +8,7 @@ import sttp.tapir.model.{ServerRequest, ServerResponse}
 import sttp.tapir.server.interceptor.log.ServerLog
 import sttp.tapir.server.interceptor.{DecodeFailureContext, DecodeSuccessContext, SecurityFailureContext}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class ServerLogger(implicit val actorSystem: ActorSystem[_])
   extends ServerLog[Future] with Blocker {

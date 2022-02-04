@@ -3,9 +3,9 @@ package com.scalamandra.provider.impl
 import akka.http.scaladsl.util.FastFuture
 import com.scalamandra.config.AuthConfig
 import com.scalamandra.model.HttpException
-import com.scalamandra.model.HttpException.{InvalidJwt, Unauthorized}
+import com.scalamandra.model.HttpException.InvalidJwt
 import com.scalamandra.model.db.User
-import com.scalamandra.model.dto.AuthedUser
+import com.scalamandra.model.dto.auth.AuthedUser
 import com.scalamandra.provider.AuthProvider
 import com.scalamandra.provider.impl.JwtAuthProvider._
 import com.scalamandra.serialization._

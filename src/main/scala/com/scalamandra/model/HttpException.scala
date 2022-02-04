@@ -38,6 +38,12 @@ object HttpException {
 
   case object InvalidCredentials extends Unauthorized("invalid credentials.")
 
+  sealed abstract class NotFound(what: String) extends HttpException(StatusCode.NotFound, s"$what not found.")
+
+  case object UserNotFound extends NotFound("User")
+
+  case object ConfirmationNotFound extends NotFound("Pending confirmation")
+
   private val codec: PlainCodec[HttpException] = Codec.string.mapDecode(cantBeDeserialized)(_.getMessage)
 
   implicit def httpExceptionCodec[T <: HttpException]: PlainCodec[T] =
