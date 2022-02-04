@@ -1,12 +1,12 @@
 package com.scalamandra.logging
 
-import akka.actor.typed.{ActorSystem, DispatcherSelector}
+import akka.actor.typed.ActorSystem
+import com.scalamandra.utils.Blocker
 import sttp.model.Headers
 import sttp.tapir.AnyEndpoint
 import sttp.tapir.model.{ServerRequest, ServerResponse}
 import sttp.tapir.server.interceptor.log.ServerLog
 import sttp.tapir.server.interceptor.{DecodeFailureContext, DecodeSuccessContext, SecurityFailureContext}
-import com.scalamandra.utils.Blocker
 
 import scala.concurrent.{ExecutionContext, Future}
 

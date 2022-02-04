@@ -6,7 +6,7 @@ import pureconfig.generic.semiauto._
 import scala.concurrent.duration.FiniteDuration
 
 case class TokenConfig(
-                        ttl: FiniteDuration,
+                        confirmationTtl: FiniteDuration,
                       )
 object TokenConfig {
 

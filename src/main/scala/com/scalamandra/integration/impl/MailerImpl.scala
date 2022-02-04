@@ -6,14 +6,13 @@ import com.scalamandra.config.EmailConfig
 import com.scalamandra.integration.Mailer
 import com.scalamandra.model.db.{Token, User}
 import com.scalamandra.utils.Blocker
-
-import scala.concurrent.{ExecutionContext, Future}
 import courier.{Mailer => Courier, _}
 
 import javax.mail.internet.{InternetAddress, MimeMessage}
 import javax.mail.{Message, Transport}
-import scala.util.{Failure, Success}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
+import scala.util.{Failure, Success}
 
 class MailerImpl(emailConfig: EmailConfig)
                 (implicit ec: ExecutionContext,

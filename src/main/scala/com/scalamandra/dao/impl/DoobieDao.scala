@@ -14,6 +14,10 @@ trait DoobieDao {
 
   implicit val ioRuntime: IORuntime
 
+  protected final def fieldName(getterName: String): String = allCaps(getterName)
+
+  protected final def tableName(typeName: String): String = s"${allCaps(typeName)}s"
+
   protected final def allCaps(camelCase: String): String = {
     val screamingSnake = new StringBuilder()
     @tailrec
@@ -38,6 +42,16 @@ trait DoobieDao {
   protected final def insert[T: Read](fields: Seq[String])(sql: => Fragment): Future[T] =
     transact {
       sql.update.withUniqueGeneratedKeys(fields: _*)
+    }
+
+  protected final def update(sql: => Fragment): Future[Int] =
+    transact {
+      sql.update.run
+    }
+
+  protected final def selectOne[T: Read](sql: => Fragment): Future[Option[T]] =
+    transact {
+      sql.query.option
     }
 
 }

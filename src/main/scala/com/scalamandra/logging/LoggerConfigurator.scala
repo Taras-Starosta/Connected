@@ -1,14 +1,14 @@
 package com.scalamandra.logging
 
-import akka.actor.typed.{ActorSystem, DispatcherSelector}
+import akka.actor.typed.ActorSystem
 import com.scalamandra.utils.Blocker
-import scribe.{Level, Logger}
 import scribe.file.FlushMode.AsynchronousFlush
 import scribe.file._
 import scribe.format.Formatter
 import scribe.handler.{AsynchronousLogHandle, LogHandlerBuilder}
 import scribe.output.format.{ANSIOutputFormat, ASCIIOutputFormat}
 import scribe.writer.ConsoleWriter
+import scribe.{Level, Logger}
 
 object LoggerConfigurator {
 

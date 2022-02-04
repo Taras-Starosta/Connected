@@ -1,8 +1,11 @@
 package com.scalamandra.model
 
+import akka.http.scaladsl.util.FastFuture
 import sttp.model.StatusCode
 import sttp.tapir.Codec.PlainCodec
-import sttp.tapir.{Codec, DecodeResult}
+import sttp.tapir.{Codec, CodecFormat, DecodeResult, EndpointOutput}
+
+import scala.concurrent.Future
 
 sealed abstract class HttpException(
                                      val statusCode: StatusCode,
@@ -11,12 +14,27 @@ sealed abstract class HttpException(
                                    ) extends Exception(message, reason)
 object HttpException {
 
+  final def oneOfHttp[T <: HttpException](value: T)
+                                         (implicit ev: Codec[String, T, CodecFormat.TextPlain]): EndpointOutput.OneOfVariant[T] = {
+    import sttp.tapir._
+    oneOfVariant(
+      statusCode(value.statusCode)
+        .and(
+          plainBody[T].description(value.getMessage)
+        )
+    )
+  }
+
+  final def error[T <: HttpException](obj: T): Future[Left[T, Nothing]] = FastFuture.successful(Left(obj))
+
   sealed abstract class Unauthorized(
                                       message: String,
                                       reason: Throwable = null.asInstanceOf[Throwable],
                                     ) extends HttpException(StatusCode.Unauthorized, message, reason)
 
   case object InvalidJwt extends Unauthorized("Invalid jwt.")
+
+  case object InvalidCredentials extends Unauthorized("invalid credentials.")
 
   private val codec: PlainCodec[HttpException] = Codec.string.mapDecode(cantBeDeserialized)(_.getMessage)
 

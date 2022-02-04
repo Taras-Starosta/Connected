@@ -31,7 +31,7 @@ libraryDependencies ++= Seq(
   scribeDep("file"),
   scribeDep("slf4j"),
   "com.github.dwickern" %% "scala-nameof" % "4.0.0" % "provided",
-  "at.favre.lib" % "bcrypt" % "0.9.0",
+  "com.github.t3hnar" %% "scala-bcrypt" % "4.3.0",
   "com.github.daddykotex" %% "courier" % "3.1.0",
   "org.flywaydb" % "flyway-core" % "8.4.3",
 )

@@ -9,8 +9,8 @@ import com.scalamandra.controller.AuthController
 import com.scalamandra.dao.impl.{TokenDaoImpl, UserDaoImpl}
 import com.scalamandra.integration.impl.MailerImpl
 import com.scalamandra.logging.LoggerConfigurator
-import com.scalamandra.provider.impl.TokenProviderImpl
-import com.scalamandra.server.impl.ServerImpl
+import com.scalamandra.provider.impl.{BCryptProviderImpl, JwtAuthProvider, TokenProviderImpl}
+import com.scalamandra.server.impl.{MigrationsImpl, ServerImpl}
 import com.scalamandra.service.impl.AuthServiceImpl
 import com.scalamandra.utils.Blocker
 import doobie.hikari.HikariTransactor
@@ -50,10 +50,12 @@ object Main {
     val bootstrap = for {
       serverConfig <- loadConfig[ServerConfig]("server")
       apiConfig <- loadConfig[ApiConfig]("api")
-      dbConf <- loadConfig[DatabaseConfig]("database")
+      dbConf <- loadConfig[DbConfig]("db")
       tokenConfig <- loadConfig[TokenConfig]("token")
       authConfig <- loadConfig[AuthConfig]("auth")
       emailConfig <- loadConfig[EmailConfig]("email")
+      bCryptConfig <- loadConfig[BCryptConfig]("bcrypt")
+      _ <- new MigrationsImpl(dbConf).start()
       controllers <- HikariTransactor.newHikariTransactor[IO](
         driverClassName = dbConf.driver,
         url = dbConf.url,
@@ -65,8 +67,17 @@ object Main {
         val userDao = new UserDaoImpl(xa)
         val mailer = new MailerImpl(emailConfig)
         val tokenProvider = new TokenProviderImpl
-        val authService = new AuthServiceImpl(userDao, mailer, tokenDao, tokenProvider)
-        val authController = new AuthController(authConfig, authService)
+        val bCryptProvider = new BCryptProviderImpl(bCryptConfig)
+        val authProvider = new JwtAuthProvider(authConfig)
+        val authService = new AuthServiceImpl(
+          mailer = mailer,
+          userDao = userDao,
+          tokenDao = tokenDao,
+          tokenProvider = tokenProvider,
+          bcryptProvider = bCryptProvider,
+          authProvider = authProvider,
+        )
+        val authController = new AuthController(apiConfig, authService)
         IO.pure(List(authController))
       }.unsafeToFuture()
       binding <- new ServerImpl(serverConfig, apiConfig, controllers).start()
