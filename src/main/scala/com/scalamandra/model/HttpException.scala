@@ -16,8 +16,8 @@ sealed abstract class HttpException(
                                    ) extends Exception(message, reason)
 object HttpException {
 
-  final def oneOfHttp[T <: HttpException: ClassTag: ErasureSameAsType](value: T)
-                                                                      (implicit ev: Codec[String, T, CodecFormat.TextPlain]): EndpointOutput.OneOfVariant[T] = {
+  final def oneOf[T <: HttpException: ClassTag: ErasureSameAsType](value: T)
+                                                                  (implicit ev: Codec[String, T, CodecFormat.TextPlain]): EndpointOutput.OneOfVariant[T] = {
     import sttp.tapir._
     oneOfVariant(
       statusCode(value.statusCode)

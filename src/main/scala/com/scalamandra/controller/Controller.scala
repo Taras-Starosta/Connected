@@ -24,6 +24,6 @@ trait Controller extends uPickleTapir {
 
   protected final def oneOfHttp[T <: HttpException: ClassTag: ErasureSameAsType](value: T)
                                                                                 (implicit ev: Codec[String, T, CodecFormat.TextPlain]): EndpointOutput.OneOfVariant[T] =
-    HttpException.oneOfHttp(value)
+    HttpException.oneOf(value)
 
 }

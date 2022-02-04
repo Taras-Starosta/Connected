@@ -41,7 +41,7 @@ class UserDaoImpl(val xa: Transactor[IO])
 
   override def create(nickname: String, email: String, password: String): Future[User] =
     insert[User](allFields) {
-      sql"insert into $table($idField, $emailField, $passField) values($nickname, $email, $password)"
+      sql"insert into $table($nickname, $emailField, $passField) values($nickname, $email, $password)"
     }
 
 }

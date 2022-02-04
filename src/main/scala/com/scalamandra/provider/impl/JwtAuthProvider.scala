@@ -26,7 +26,7 @@ class JwtAuthProvider(authConfig: AuthConfig)
       auth.bearer[JwtClaim]()
     ).errorOut(
       oneOf[Unauthorized](
-        HttpException.oneOfHttp(InvalidJwt)
+        HttpException.oneOf(InvalidJwt)
       )
     ).serverSecurityLogic[AuthedUser, Future] { jwt =>
       if(jwt.isValid) {

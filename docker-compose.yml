@@ -9,6 +9,11 @@ services:
       PSQL_URL: jdbc:postgresql://psql:5432/connected-db
       PSQL_USER: connected-admin
       PSQL_PASSWORD: Str0ngP@ss_Ul1!Ul1!
+      SERVER_HOST: 127.0.0.1
+      SERVER_POST: 9000
+      GMAIL_USER:
+      GMAIL_PASS:
+      GMAIL_ADDR:
 
   psql:
     image: postgres
