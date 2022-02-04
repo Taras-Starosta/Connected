@@ -53,10 +53,10 @@ class TokenDaoImpl(
       sql"insert into $table($bodyField, $userField, $expiredField) values($body, ${user.id}, $expiredAt)"
     }
 
-  override def confirm(user: User, body: String): Future[Boolean] =
+  override def confirm(userId: Long, body: String): Future[Boolean] =
     for {
       affected <- update {
-        sql"delete from $table where $bodyField=$body and $userField=${user.id}"
+        sql"delete from $table where $bodyField=$body and $userField=$userId"
       }
     } yield affected > 0
 
@@ -70,10 +70,10 @@ class TokenDaoImpl(
       }
     } yield result
 
-  override def refresh(user: User, body: String): Future[Boolean] =
+  override def refresh(userId: Long, body: String): Future[Boolean] =
     for {
       maybeToken <- selectOne[RefreshToken] {
-        sql"select $bodyField, $userField from $table where $bodyField=$body and $userField=$user"
+        sql"select $bodyField, $userField from $table where $bodyField=$body and $userField=$userId"
       }
     } yield maybeToken.nonEmpty
 

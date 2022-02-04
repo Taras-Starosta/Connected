@@ -10,6 +10,7 @@ import com.scalamandra.provider.AuthProvider
 import com.scalamandra.provider.impl.JwtAuthProvider._
 import com.scalamandra.serialization._
 import pdi.jwt.{JwtAlgorithm, JwtClaim, JwtUpickle}
+import sttp.tapir.EndpointOutput.OneOfVariant
 import sttp.tapir._
 import sttp.tapir.server.PartialServerEndpoint
 
@@ -21,12 +22,13 @@ import scala.util.{Failure, Success}
 class JwtAuthProvider(authConfig: AuthConfig)
                      (implicit clock: Clock) extends AuthProvider[Future, JwtClaim]{
 
-  override def authed: PartialServerEndpoint[JwtClaim, AuthedUser, Unit, Unauthorized, Unit, Any, Future] =
+  override def authed(errorOut: OneOfVariant[_ <: HttpException]*): PartialServerEndpoint[JwtClaim, AuthedUser, Unit, HttpException, Unit, Any, Future] =
     endpoint.securityIn(
       auth.bearer[JwtClaim]()
     ).errorOut(
-      oneOf[Unauthorized](
-        HttpException.oneOf(InvalidJwt)
+      oneOf[HttpException](
+        HttpException.oneOf(InvalidJwt),
+        errorOut: _*,
       )
     ).serverSecurityLogic[AuthedUser, Future] { jwt =>
       if(jwt.isValid) {
@@ -63,7 +65,11 @@ class JwtAuthProvider(authConfig: AuthConfig)
       email = user.email,
       avatarUrl = user.avatarUrl,
     )
-    val content = write(payload)
+    releaseAuth(payload)
+  }
+
+  override def releaseAuth(user: AuthedUser): String = {
+    val content = write(user)
     val claim = JwtClaim(content)
     serializeClaim(claim)
   }

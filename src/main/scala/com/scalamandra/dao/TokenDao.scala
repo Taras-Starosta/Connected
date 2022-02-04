@@ -9,10 +9,10 @@ trait TokenDao {
 
   def createConfirmation(user: User, body: String): Future[ConfirmationToken]
 
-  def confirm(user: User, body: String): Future[Boolean]
+  def confirm(userId: Long, body: String): Future[Boolean]
 
   def createRefresh(user: User, body: String): Future[RefreshToken]
 
-  def refresh(user: User, body: String): Future[Boolean]
+  def refresh(userId: Long, body: String): Future[Boolean]
 
 }

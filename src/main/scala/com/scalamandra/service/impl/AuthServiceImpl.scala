@@ -4,7 +4,7 @@ import com.scalamandra.dao.{TokenDao, UserDao}
 import com.scalamandra.integration.Mailer
 import com.scalamandra.model.HttpException.{Conflict, InvalidCredentials, Unauthorized, UserAlreadyExists}
 import com.scalamandra.model.db.User
-import com.scalamandra.model.dto.{LoginRequest, LoginResponse, RegisterRequest}
+import com.scalamandra.model.dto.{AuthedUser, LoginRequest, LoginResponse, RefreshRequest, RefreshResponse, RegisterRequest}
 import com.scalamandra.provider.{AuthProvider, BCryptProvider, TokenProvider}
 import com.scalamandra.service.AuthService
 import pdi.jwt.JwtClaim
@@ -62,5 +62,16 @@ class AuthServiceImpl(
       }
     } yield result
   }
+
+  override def refresh(authedUser: AuthedUser, request: RefreshRequest): Future[Either[Unauthorized, RefreshResponse]] =
+    for {
+      success <- tokenDao.refresh(authedUser.id, request.refreshToken)
+    } yield if(success) {
+      Right(
+        RefreshResponse(
+          authProvider.releaseAuth(authedUser)
+        )
+      )
+    } else Left(InvalidCredentials)
 
 }
