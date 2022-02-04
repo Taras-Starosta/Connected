@@ -34,9 +34,20 @@ libraryDependencies ++= Seq(
   "com.github.t3hnar" %% "scala-bcrypt" % "4.3.0",
   "com.github.daddykotex" %% "courier" % "3.1.0",
   "org.flywaydb" % "flyway-core" % "8.4.3",
+  "org.webjars" % "swagger-ui" % "4.4.1-1",
 )
 
-enablePlugins(UniversalPlugin)
+assembly / assemblyJarName := "connected.jar"
+
+ThisBuild / assemblyMergeStrategy := {
+  case PathList("META-INF", "maven", "org.webjars", "swagger-ui", "pom.properties") =>
+    MergeStrategy.first
+  case PathList("META-INF", "maven", "org.webjars", "swagger-ui", "pom.xml") =>
+    MergeStrategy.first
+  case x =>
+    val oldStrategy = (ThisBuild / assemblyMergeStrategy).value
+    oldStrategy(x)
+}
 
 scalacOptions ++= Seq(
   "-deprecation"

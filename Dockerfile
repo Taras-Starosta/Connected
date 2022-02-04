@@ -1,6 +1,6 @@
-FROM ghcr.io/graalvm/jdk:java17-22.0.0
-COPY target/universal/ .
+FROM ghcr.io/graalvm/jdk:java17-21.3.0
+COPY target/scala-2.13/connected.jar .
 
-CMD stage/bin/connected
+CMD java -jar connected.jar
 
-EXPOSE 9000
+EXPOSE 9999
