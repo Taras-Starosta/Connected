@@ -18,11 +18,10 @@ object HttpException {
 
   case object InvalidJwt extends Unauthorized("Invalid jwt.")
 
-  implicit val httpExceptionCodec: PlainCodec[HttpException] =
-    Codec.string.mapDecode(cantBeDeserialized)(_.getMessage)
+  private val codec: PlainCodec[HttpException] = Codec.string.mapDecode(cantBeDeserialized)(_.getMessage)
 
-  implicit val invalidJwtCodec: PlainCodec[InvalidJwt.type] =
-    httpExceptionCodec.asInstanceOf[PlainCodec[InvalidJwt.type]]
+  implicit def httpExceptionCodec[T <: HttpException]: PlainCodec[T] =
+    codec.asInstanceOf[PlainCodec[T]]
 
   case object CantBeDeserialized extends Exception("Cant be deserialized.")
 

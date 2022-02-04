@@ -7,7 +7,6 @@ import com.scalamandra.model.HttpException._
 import com.scalamandra.model.dto.AuthedUser
 import com.scalamandra.serialization._
 import pdi.jwt._
-import sttp.model.StatusCode
 import sttp.tapir._
 
 import java.time.Clock
@@ -25,27 +24,22 @@ trait AuthedController extends Controller {
     endpoint.securityIn(
       auth.bearer[JwtClaim]()
     ).errorOut(
-        oneOf[Unauthorized](
-          oneOfVariant(
-            statusCode(StatusCode.Unauthorized).and(
-              plainBody[InvalidJwt.type]
-                .description("Jwt expired of cannot be parsed.")
-            )
-          )
-        )
-      ).serverSecurityLogic[AuthedUser, Future] { jwt =>
-        if(jwt.isValid) {
-          try {
-            val user = read[AuthedUser](jwt.content)
-            FastFuture.successful(Right(user))
-          } catch {
-            case NonFatal(_) =>
-              invalidJwt
-          }
-        } else {
-          invalidJwt
+      oneOf[Unauthorized](
+        oneOfHttp(InvalidJwt)
+      )
+    ).serverSecurityLogic[AuthedUser, Future] { jwt =>
+      if(jwt.isValid) {
+        try {
+          val user = read[AuthedUser](jwt.content)
+          FastFuture.successful(Right(user))
+        } catch {
+          case NonFatal(_) =>
+            invalidJwt
         }
+      } else {
+        invalidJwt
       }
+    }
 
   private val jwtAlgorithm: JwtAlgorithm = JwtAlgorithm.HS256
 

@@ -8,8 +8,10 @@ case class DatabaseConfig(
                            url:      String,
                            user:     String,
                            password: String,
+                           migrations: Boolean,
                          )
-
 object DatabaseConfig {
+
   implicit val reader: ConfigReader[DatabaseConfig] = deriveReader[DatabaseConfig]
+
 }

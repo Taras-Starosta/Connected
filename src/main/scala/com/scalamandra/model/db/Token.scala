@@ -4,5 +4,6 @@ import java.time.Instant
 
 case class Token(
                   body: String,
+                  userId: Long,
                   expiredAt: Instant,
                 )

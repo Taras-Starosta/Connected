@@ -13,8 +13,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class AuthServiceImpl(
                        userDao: UserDao,
                        mailer: Mailer,
-                       tokenProvider: TokenProvider,
                        tokenDao: TokenDao,
+                       tokenProvider: TokenProvider,
                      )(implicit ec: ExecutionContext) extends AuthService {
 
   override def register(request: RegisterRequest): Future[Either[Conflict, Unit]] =
@@ -27,14 +27,14 @@ class AuthServiceImpl(
           )
         case None =>
           for {
-            _ <- userDao.create(
+            user <- userDao.create(
               nickname = request.nickname,
               email = request.email,
               password = request.password,
             )
             tokenBody = tokenProvider.generateToken
-            token <- tokenDao.create(tokenBody)
-            _ <- mailer.sendConfirmation(token)
+            token <- tokenDao.create(user, tokenBody)
+            _ = mailer.sendConfirmation(user, token)
           } yield Right(())
       }
     } yield result
