@@ -9,6 +9,7 @@ import com.scalamandra.model.dto.auth.AuthedUser
 import com.scalamandra.provider.AuthProvider
 import com.scalamandra.provider.impl.JwtAuthProvider._
 import com.scalamandra.serialization._
+import com.scalamandra.utils.HttpExceptionUtils
 import pdi.jwt.{JwtAlgorithm, JwtClaim, JwtUpickle}
 import sttp.tapir.EndpointOutput.OneOfVariant
 import sttp.tapir._
@@ -27,7 +28,7 @@ class JwtAuthProvider(authConfig: AuthConfig)
       auth.bearer[JwtClaim]()
     ).errorOut(
       oneOf[HttpException](
-        HttpException.oneOf(InvalidJwt),
+        HttpExceptionUtils.oneOf(InvalidJwt),
         errorOut: _*,
       )
     ).serverSecurityLogic[AuthedUser, Future] { jwt =>
@@ -77,7 +78,7 @@ class JwtAuthProvider(authConfig: AuthConfig)
 }
 object JwtAuthProvider {
 
-  private val invalidJwt = HttpException.error(InvalidJwt)
+  private val invalidJwt = HttpExceptionUtils.error(InvalidJwt)
 
   private val jwtAlgorithm: JwtAlgorithm = JwtAlgorithm.HS256
 

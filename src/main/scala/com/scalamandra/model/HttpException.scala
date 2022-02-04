@@ -16,19 +16,6 @@ sealed abstract class HttpException(
                                    ) extends Exception(message, reason)
 object HttpException {
 
-  final def oneOf[T <: HttpException: ClassTag: ErasureSameAsType](value: T)
-                                                                  (implicit ev: Codec[String, T, CodecFormat.TextPlain]): EndpointOutput.OneOfVariant[T] = {
-    import sttp.tapir._
-    oneOfVariant(
-      statusCode(value.statusCode)
-        .and(
-          plainBody[T].description(value.getMessage)
-        )
-    )
-  }
-
-  final def error[T <: HttpException](obj: T): Future[Left[T, Nothing]] = FastFuture.successful(Left(obj))
-
   sealed abstract class Unauthorized(
                                       message: String,
                                       reason: Throwable = null.asInstanceOf[Throwable],

@@ -77,7 +77,7 @@ object Main {
           bcryptProvider = bCryptProvider,
           authProvider = authProvider,
         )
-        val authController = new AuthController(apiConfig, authService)
+        val authController = new AuthController(apiConfig, authService, authProvider)
         IO.pure(List(authController))
       }.unsafeToFuture()
       binding <- new ServerImpl(serverConfig, apiConfig, controllers).start()

@@ -9,6 +9,7 @@ import com.scalamandra.model.db.Token.{ConfirmationToken, RefreshToken}
 import com.scalamandra.model.db.{Token, User}
 import doobie._
 import doobie.implicits._
+import doobie.implicits.legacy.instant._ //DO NOT DELETE
 
 import java.time.{Clock, Instant}
 import scala.concurrent.{ExecutionContext, Future}

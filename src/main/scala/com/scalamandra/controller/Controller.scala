@@ -3,6 +3,7 @@ package com.scalamandra.controller
 import com.scalamandra.config.ApiConfig
 import com.scalamandra.model.HttpException
 import com.scalamandra.serialization.uPickleTapir
+import com.scalamandra.utils.HttpExceptionUtils
 import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams
 import sttp.tapir._
@@ -24,6 +25,6 @@ trait Controller extends uPickleTapir {
 
   protected final def oneOfHttp[T <: HttpException: ClassTag: ErasureSameAsType](value: T)
                                                                                 (implicit ev: Codec[String, T, CodecFormat.TextPlain]): EndpointOutput.OneOfVariant[T] =
-    HttpException.oneOf(value)
+    HttpExceptionUtils.oneOf(value)
 
 }
