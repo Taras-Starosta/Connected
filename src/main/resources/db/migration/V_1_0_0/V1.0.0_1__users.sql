@@ -1,6 +1,6 @@
 CREATE TABLE USERS(
     ID         BIGSERIAL             PRIMARY KEY,
-    NICKANME   TEXT                  NOT NULL,
+    NICKNAME   TEXT                  NOT NULL,
     EMAIL      TEXT    UNIQUE        NOT NULL,
     PASSWORD   TEXT                  NOT NULL,
     AVATAR_URL TEXT    DEFAULT NULL,

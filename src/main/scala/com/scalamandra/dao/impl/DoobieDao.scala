@@ -4,6 +4,7 @@ import cats.effect.IO
 import cats.effect.unsafe.IORuntime
 import doobie._
 import doobie.implicits._
+import doobie.util.fragment
 
 import scala.annotation.tailrec
 import scala.concurrent.Future
@@ -16,7 +17,7 @@ trait DoobieDao {
 
   protected final def fieldName(getterName: String): String = allCaps(getterName)
 
-  protected final def tableName(typeName: String): String = s"${allCaps(typeName)}s"
+  protected final def tableName(typeName: String): String = s"${allCaps(typeName)}S"
 
   protected final def allCaps(camelCase: String): String = {
     val screamingSnake = new StringBuilder()
@@ -38,11 +39,6 @@ trait DoobieDao {
 
   protected final def transact[T](body: => ConnectionIO[T]): Future[T] =
     body.transact(xa).unsafeToFuture()
-
-  protected final def insert[T: Read](fields: Seq[String])(sql: => Fragment): Future[T] =
-    transact {
-      sql.update.withUniqueGeneratedKeys(fields: _*)
-    }
 
   protected final def update(sql: => Fragment): Future[Int] =
     transact {
