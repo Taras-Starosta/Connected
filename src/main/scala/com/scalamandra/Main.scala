@@ -56,13 +56,13 @@ object Main {
       emailConfig <- loadConfig[EmailConfig]("email")
       bCryptConfig <- loadConfig[BCryptConfig]("bcrypt")
       _ <- new MigrationsImpl(dbConf).start()
-      controllers <- HikariTransactor.newHikariTransactor[IO](
+      _ <- HikariTransactor.newHikariTransactor[IO](
         driverClassName = dbConf.driver,
         url = dbConf.url,
         user = dbConf.user,
         pass = dbConf.password,
         connectEC = Blocker.blockingEC,
-      ).use { xa =>
+      ).map { xa =>
         val tokenDao = new TokenDaoImpl(xa, tokenConfig)
         val userDao = new UserDaoImpl(xa)
         val mailer = new MailerImpl(emailConfig)
@@ -78,15 +78,18 @@ object Main {
           authProvider = authProvider,
         )
         val authController = new AuthController(apiConfig, authService, authProvider)
-        IO.pure(List(authController))
-      }.unsafeToFuture()
-      binding <- new ServerImpl(serverConfig, apiConfig, controllers).start()
-      _ = scribe.info(s"Server started.")
-    } yield sys.addShutdownHook {
-      scribe.info("Request server termination.")
-      binding.unbind()
-      shutdown()
-    }
+        val controllers = List(authController)
+        val server = new ServerImpl(serverConfig, apiConfig, controllers)
+        for {
+          binding <- server.start()
+          _ = scribe.info(s"Server started.")
+        } yield sys.addShutdownHook {
+          scribe.info("Request server termination.")
+          binding.unbind()
+          shutdown()
+        }
+      }.useForever.unsafeToFuture()
+    } yield ()
 
     bootstrap.recover {
       case NonFatal(exc) =>
