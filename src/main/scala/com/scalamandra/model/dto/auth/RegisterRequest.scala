@@ -1,4 +1,4 @@
-package com.scalamandra.model.dto
+package com.scalamandra.model.dto.auth
 
 import com.scalamandra.serialization._
 
@@ -9,6 +9,6 @@ case class RegisterRequest(
                           )
 object RegisterRequest {
 
-  implicit val reader: Reader[RegisterRequest] = macroR[RegisterRequest]
+  implicit val reader: ReadWriter[RegisterRequest] = macroRW[RegisterRequest]
 
 }

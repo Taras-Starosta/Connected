@@ -1,9 +1,9 @@
 package com.scalamandra.config
 
-import scala.concurrent.duration.FiniteDuration
-
 import pureconfig.ConfigReader
 import pureconfig.generic.semiauto._
+
+import scala.concurrent.duration.FiniteDuration
 
 case class AuthConfig(
                        jwtTtl: FiniteDuration,

@@ -8,6 +8,8 @@ trait UserDao {
 
   def getByEmail(email: String): Future[Option[User]]
 
-  def create(email: String, password: String): Future[User]
+  def create(nickname: String, email: String, password: String): Future[User]
+
+  def activate(userId: Long, token: String): Future[Boolean]
 
 }

@@ -1,0 +1,8 @@
+CREATE TABLE USERS(
+    ID         BIGSERIAL             PRIMARY KEY,
+    NICKNAME   TEXT                  NOT NULL,
+    EMAIL      TEXT    UNIQUE        NOT NULL,
+    PASSWORD   TEXT                  NOT NULL,
+    AVATAR_URL TEXT    DEFAULT NULL,
+    ACTIVE     BOOLEAN DEFAULT FALSE NOT NULL
+);

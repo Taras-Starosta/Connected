@@ -1,9 +1,10 @@
 package com.scalamandra.serialization
-import scala.util.{Failure, Success, Try}
-import sttp.tapir._
 import sttp.tapir.Codec.JsonCodec
 import sttp.tapir.DecodeResult.Error.JsonDecodeException
 import sttp.tapir.DecodeResult.{Error, Value}
+import sttp.tapir._
+
+import scala.util.{Failure, Success, Try}
 
 trait uPickleTapir {
 

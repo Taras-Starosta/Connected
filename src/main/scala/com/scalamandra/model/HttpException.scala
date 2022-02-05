@@ -1,8 +1,13 @@
 package com.scalamandra.model
 
+import akka.http.scaladsl.util.FastFuture
 import sttp.model.StatusCode
 import sttp.tapir.Codec.PlainCodec
-import sttp.tapir.{Codec, DecodeResult}
+import sttp.tapir.typelevel.ErasureSameAsType
+import sttp.tapir.{Codec, CodecFormat, DecodeResult, EndpointOutput}
+
+import scala.concurrent.Future
+import scala.reflect.ClassTag
 
 sealed abstract class HttpException(
                                      val statusCode: StatusCode,
@@ -18,11 +23,18 @@ object HttpException {
 
   case object InvalidJwt extends Unauthorized("Invalid jwt.")
 
-  implicit val httpExceptionCodec: PlainCodec[HttpException] =
-    Codec.string.mapDecode(cantBeDeserialized)(_.getMessage)
+  case object InvalidCredentials extends Unauthorized("invalid credentials.")
 
-  implicit val invalidJwtCodec: PlainCodec[InvalidJwt.type] =
-    httpExceptionCodec.asInstanceOf[PlainCodec[InvalidJwt.type]]
+  sealed abstract class NotFound(what: String) extends HttpException(StatusCode.NotFound, s"$what not found.")
+
+  case object UserNotFound extends NotFound("User")
+
+  case object ConfirmationNotFound extends NotFound("Pending confirmation")
+
+  private val codec: PlainCodec[HttpException] = Codec.string.mapDecode(cantBeDeserialized)(_.getMessage)
+
+  implicit def httpExceptionCodec[T <: HttpException]: PlainCodec[T] =
+    codec.asInstanceOf[PlainCodec[T]]
 
   case object CantBeDeserialized extends Exception("Cant be deserialized.")
 
@@ -31,5 +43,9 @@ object HttpException {
       serialized,
       CantBeDeserialized,
     )
+
+  sealed abstract class Conflict(reason: String) extends HttpException(StatusCode.Conflict, reason)
+
+  case object UserAlreadyExists extends Conflict("User already exists.")
 
 }
