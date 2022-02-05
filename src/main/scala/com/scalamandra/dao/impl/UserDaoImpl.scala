@@ -1,7 +1,7 @@
 package com.scalamandra.dao.impl
 
-import cats.effect.IO
 import cats.effect.unsafe.IORuntime
+import cats.effect.{Async, IO}
 import com.github.dwickern.macros.NameOf._
 import com.scalamandra.dao.UserDao
 import com.scalamandra.model.db.User
@@ -32,5 +32,14 @@ class UserDaoImpl(val xa: Transactor[IO])
         result <- sql"select * from users where id=$id".query[User].unique
       } yield result
     }
+
+  override def activate(userId: Long, token: String): Future[Boolean] = transact {
+    for {
+      affectedTokens <- sql"delete from tokens where body=$token and user_id=$userId".update.run
+      affectedUsers <- if(affectedTokens > 0) {
+        sql"update users set active=true where id=$userId".update.run
+      } else WeakAsync[ConnectionIO].pure(0)
+    } yield affectedUsers > 0
+  }
 
 }

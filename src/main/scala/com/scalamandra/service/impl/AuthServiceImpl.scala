@@ -77,7 +77,7 @@ class AuthServiceImpl(
 
   override def activate(request: ActivationRequest): Future[Either[HttpException.NotFound, Unit]] =
     for {
-      success <- tokenDao.confirm(request.userId, request.token)
+      success <- userDao.activate(request.userId, request.token)
     } yield if(success) Right(())
       else Left(ConfirmationNotFound)
 

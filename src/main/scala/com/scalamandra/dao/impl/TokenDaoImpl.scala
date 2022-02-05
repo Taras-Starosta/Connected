@@ -39,13 +39,6 @@ class TokenDaoImpl(
       } yield result
     }
 
-  override def confirm(userId: Long, body: String): Future[Boolean] =
-    for {
-      affected <- update {
-        sql"delete from tokens where body=$body and user_id=$userId"
-      }
-    } yield affected > 0
-
   override def createRefresh(user: User, body: String): Future[RefreshToken] =
     transact {
       for {
