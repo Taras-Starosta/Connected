@@ -1,7 +1,6 @@
 package com.scalamandra.controller
 
 import com.scalamandra.config.ApiConfig
-import com.scalamandra.model.HttpException
 import com.scalamandra.model.HttpException._
 import com.scalamandra.model.dto.auth._
 import com.scalamandra.provider.AuthProvider
@@ -18,7 +17,7 @@ class AuthController(
                       authProvider: AuthProvider[Future, JwtClaim]
                     ) extends Controller {
 
-  override def endpoints: List[Endpoint] =
+  override val endpoints: List[Endpoint] =
     List(
       register,
       login,

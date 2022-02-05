@@ -20,6 +20,7 @@ class ServerImpl(
                   serverConfig: ServerConfig,
                   apiConfig: ApiConfig,
                   controllers: List[Controller],
+                  swaggerDocs: List[Controller],
                 )(implicit
                   val actorSystem: ActorSystem[_],
                   ec: ExecutionContext) extends Server with Blocker {
@@ -47,7 +48,7 @@ class ServerImpl(
     val endpoints = controllers.flatMap(_.endpoints)
     val docs = if(apiConfig.swagger) {
       SwaggerInterpreter().fromServerEndpoints[Future](
-        endpoints,
+        swaggerDocs.flatMap(_.endpoints),
         apiConfig.name,
         apiConfig.version,
       )
