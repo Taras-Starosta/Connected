@@ -16,10 +16,11 @@ class ChatController(
                       chatService: ChatService,
                     ) extends Controller {
 
-  override val endpoints: List[Endpoint] = List(chat)
+  override lazy val endpoints: List[Endpoint] = List(chat)
 
   def chat: Endpoint =
     authProvider.wsAuthed()
+      .post
       .description("Chat websockets endpoint.")
       .in(version / "chat")
       .out(

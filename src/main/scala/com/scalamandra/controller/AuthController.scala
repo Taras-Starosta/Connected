@@ -17,7 +17,7 @@ class AuthController(
                       authProvider: AuthProvider[Future, JwtClaim]
                     ) extends Controller {
 
-  override val endpoints: List[Endpoint] =
+  override lazy val endpoints: List[Endpoint] =
     List(
       register,
       login,
