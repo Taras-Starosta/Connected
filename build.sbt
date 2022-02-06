@@ -7,7 +7,7 @@ scalaVersion := "2.13.8"
 lazy val AkkaVersion = "2.6.18"
 lazy val AkkaGroup = "com.typesafe.akka"
 def akkaDep(module: String): ModuleID = AkkaGroup %% s"akka-$module" % AkkaVersion
-def tapirDep(module: String): ModuleID = "com.softwaremill.sttp.tapir" %% s"tapir-$module" % "0.20.0-M6"
+def tapirDep(module: String): ModuleID = "com.softwaremill.sttp.tapir" %% s"tapir-$module" % "0.20.0-M9"
 def jwtDep(module: String): ModuleID = "com.github.jwt-scala" %% s"jwt-$module" % "9.0.3"
 def doobieDep(module: String): ModuleID = "org.tpolecat" %% s"doobie-$module" % "1.0.0-RC1"
 def scribeDep(module: String = ""): ModuleID = "com.outr" %% s"scribe${
@@ -21,6 +21,8 @@ libraryDependencies ++= Seq(
   AkkaGroup %% "akka-http" % "10.2.7",
   tapirDep("akka-http-server"),
   tapirDep("swagger-ui-bundle"),
+  tapirDep("asyncapi-docs"),
+  tapirDep("asyncapi-circe-yaml"),
   jwtDep("core"),
   jwtDep("upickle"),
   "com.lihaoyi" %% "upickle" % "1.4.3",

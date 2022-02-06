@@ -86,11 +86,13 @@ object Main {
           chatController = new ChatController(apiConfig, authProvider, chatService)
           controllers = List(authController, chatController)
           swaggerDocs = List(authController)
+          asyncDocs = List(chatController)
           server = new ServerImpl(
             serverConfig = serverConfig,
             apiConfig = apiConfig,
             controllers = controllers,
             swaggerDocs = swaggerDocs,
+            asyncApiDocs = asyncDocs,
           )
           binding <- server.start()
           _ = scribe.info(s"Server started.")

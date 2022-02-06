@@ -7,6 +7,7 @@ case class ApiConfig(
                       name: String,
                       version: String,
                       swagger: Boolean,
+                      asyncApiDocs: Boolean,
                     )
 object ApiConfig {
 
