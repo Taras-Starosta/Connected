@@ -69,8 +69,9 @@ class AuthController(
       .serverLogic(authService.activate)
 
   def apiKey: Endpoint =
-    authProvider.httpAuthed()
-      .get
+    authProvider.httpAuthed(
+      oneOfHttp(InvalidCredentials)
+    ).get
       .description("Get api key")
       .in(basePath / "key")
       .in(clientIp)
