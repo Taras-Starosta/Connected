@@ -1,11 +1,13 @@
 package com.scalamandra.controller
 
 import com.scalamandra.config.ApiConfig
-import com.scalamandra.model.HttpException
+import com.scalamandra.model.{HttpException, WsException}
 import com.scalamandra.serialization.uPickleTapir
-import com.scalamandra.utils.HttpExceptionUtils
+import com.scalamandra.utils.ExceptionUtils
 import sttp.capabilities.WebSockets
 import sttp.capabilities.akka.AkkaStreams
+import sttp.tapir.Codec.PlainCodec
+import sttp.tapir.EndpointOutput.OneOfVariant
 import sttp.tapir._
 import sttp.tapir.server.ServerEndpoint
 import sttp.tapir.typelevel.ErasureSameAsType
@@ -23,8 +25,10 @@ trait Controller extends uPickleTapir {
 
   def endpoints: List[Endpoint]
 
-  protected final def oneOfHttp[T <: HttpException: ClassTag: ErasureSameAsType](value: T)
-                                                                                (implicit ev: Codec[String, T, CodecFormat.TextPlain]): EndpointOutput.OneOfVariant[T] =
-    HttpExceptionUtils.oneOf(value)
+  protected final def oneOfHttp[T <: HttpException: ClassTag: ErasureSameAsType: PlainCodec](value: T): OneOfVariant[T] =
+    ExceptionUtils.oneOfHttp(value)
+
+  protected final def oneOfWs[T <: WsException: ClassTag: ErasureSameAsType: PlainCodec](value: T): OneOfVariant[T] =
+    ExceptionUtils.oneOfWs(value)
 
 }

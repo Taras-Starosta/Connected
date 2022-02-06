@@ -1,7 +1,6 @@
 package com.scalamandra.controller
 
 import com.scalamandra.config.ApiConfig
-import com.scalamandra.model.HttpException
 import com.scalamandra.model.HttpException._
 import com.scalamandra.model.dto.auth._
 import com.scalamandra.provider.AuthProvider
@@ -18,12 +17,13 @@ class AuthController(
                       authProvider: AuthProvider[Future, JwtClaim]
                     ) extends Controller {
 
-  override def endpoints: List[Endpoint] =
+  override lazy val endpoints: List[Endpoint] =
     List(
       register,
       login,
       refresh,
       activate,
+      apiKey,
     )
 
   val basePath: EndpointInput[Unit] = version / "auth"
@@ -46,7 +46,7 @@ class AuthController(
       .serverLogic(authService.login)
 
   def refresh: Endpoint =
-    authProvider.authed(
+    authProvider.httpAuthed(
       oneOfHttp(InvalidCredentials)
     ).post
       .description("Refresh jwt session")
@@ -67,5 +67,17 @@ class AuthController(
       )
       .mapInTo[ActivationRequest]
       .serverLogic(authService.activate)
+
+  def apiKey: Endpoint =
+    authProvider.httpAuthed(
+      oneOfHttp(InvalidCredentials)
+    ).get
+      .description("Get api key")
+      .in(basePath / "key")
+      .in(clientIp)
+      .out(jsonBody[ApiKey])
+      .serverLogic { u => ip =>
+        authService.apiKey(u, ip)
+      }
 
 }

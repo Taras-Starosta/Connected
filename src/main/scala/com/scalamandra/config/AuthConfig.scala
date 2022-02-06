@@ -7,6 +7,7 @@ import scala.concurrent.duration.FiniteDuration
 
 case class AuthConfig(
                        jwtTtl: FiniteDuration,
+                       apiKeyTtl: FiniteDuration,
                        appSecret: String,
                      )
 object AuthConfig {

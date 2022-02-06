@@ -1,7 +1,7 @@
 package com.scalamandra.dao.impl
 
+import cats.effect.IO
 import cats.effect.unsafe.IORuntime
-import cats.effect.{Async, IO}
 import com.github.dwickern.macros.NameOf._
 import com.scalamandra.dao.UserDao
 import com.scalamandra.model.db.User

@@ -5,13 +5,13 @@ import akka.http.scaladsl.util.FastFuture
 import cats.effect.IO
 import cats.effect.unsafe.IORuntime
 import com.scalamandra.config._
-import com.scalamandra.controller.AuthController
-import com.scalamandra.dao.impl.{TokenDaoImpl, UserDaoImpl}
-import com.scalamandra.integration.impl.MailerImpl
+import com.scalamandra.controller._
+import com.scalamandra.dao.impl._
+import com.scalamandra.integration.impl._
 import com.scalamandra.logging.LoggerConfigurator
-import com.scalamandra.provider.impl.{BCryptProviderImpl, JwtAuthProvider, TokenProviderImpl}
-import com.scalamandra.server.impl.{MigrationsImpl, ServerImpl}
-import com.scalamandra.service.impl.AuthServiceImpl
+import com.scalamandra.provider.impl._
+import com.scalamandra.server.impl._
+import com.scalamandra.service.impl._
 import com.scalamandra.utils.Blocker
 import doobie.hikari.HikariTransactor
 import pureconfig._
@@ -55,6 +55,7 @@ object Main {
       authConfig <- loadConfig[AuthConfig]("auth")
       emailConfig <- loadConfig[EmailConfig]("email")
       bCryptConfig <- loadConfig[BCryptConfig]("bcrypt")
+      chatConfig <- loadConfig[ChatConfig]("chat")
       _ <- new MigrationsImpl(dbConf).start()
       _ <- HikariTransactor.newHikariTransactor[IO](
         driverClassName = dbConf.driver,
@@ -68,7 +69,8 @@ object Main {
         val mailer = new MailerImpl(emailConfig)
         val tokenProvider = new TokenProviderImpl
         val bCryptProvider = new BCryptProviderImpl(bCryptConfig)
-        val authProvider = new JwtAuthProvider(authConfig)
+        val apiKeyDao = new ApiKeyDaoImpl(tokenProvider, authConfig)
+        val authProvider = new JwtAuthProvider(authConfig, apiKeyDao)
         val authService = new AuthServiceImpl(
           mailer = mailer,
           userDao = userDao,
@@ -78,9 +80,20 @@ object Main {
           authProvider = authProvider,
         )
         val authController = new AuthController(apiConfig, authService, authProvider)
-        val controllers = List(authController)
-        val server = new ServerImpl(serverConfig, apiConfig, controllers)
         for {
+          chatDao <- ChatDaoImpl.make(chatConfig, tokenProvider)
+          chatService = new ChatServiceImpl(chatDao)
+          chatController = new ChatController(apiConfig, authProvider, chatService)
+          controllers = List(authController, chatController)
+          swaggerDocs = List(authController)
+          asyncDocs = List(chatController)
+          server = new ServerImpl(
+            serverConfig = serverConfig,
+            apiConfig = apiConfig,
+            controllers = controllers,
+            swaggerDocs = swaggerDocs,
+            asyncApiDocs = asyncDocs,
+          )
           binding <- server.start()
           _ = scribe.info(s"Server started.")
         } yield sys.addShutdownHook {
