@@ -42,7 +42,7 @@ libraryDependencies ++= Seq(
   cacheDep("caffeine"),
 )
 
-assembly / assemblyJarName := "connected.jar"
+assembly / assemblyJarName := "client.jar"
 
 ThisBuild / assemblyMergeStrategy := {
   case PathList("META-INF", "maven", "org.webjars", "swagger-ui", "pom.properties") =>

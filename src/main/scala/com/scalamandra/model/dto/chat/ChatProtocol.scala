@@ -1,7 +1,6 @@
 package com.scalamandra.model.dto.chat
 
-import com.scalamandra.model.db.Message
-import com.scalamandra.model.dto.auth.AuthedUser
+import com.scalamandra.model.{AuthedUser, Message}
 import com.scalamandra.serialization._
 
 sealed trait ChatProtocol
