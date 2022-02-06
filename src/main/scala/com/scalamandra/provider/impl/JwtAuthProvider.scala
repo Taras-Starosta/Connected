@@ -49,22 +49,28 @@ class JwtAuthProvider(authConfig: AuthConfig,
       }
     }
 
-  override def wsAuthed(errorOut: OneOfVariant[_ <: WsException]*): PartialServerEndpoint[String, AuthedUser, Unit, WsException, Unit, Any, Future] =
+  override def wsAuthed(errorOut: OneOfVariant[_ <: WsException]*): PartialServerEndpoint[KeyAndIp, AuthedUser, Unit, WsException, Unit, Any, Future] =
     endpoint.securityIn(
       auth.apiKey(query[String]("key"))
+        .and(clientIp)
     ).errorOut(
       oneOf[WsException](
         ExceptionUtils.oneOfWs(InvalidApiKey),
         errorOut: _*,
       )
-    ).serverSecurityLogic[AuthedUser, Future] { apiKey =>
-      for {
-        maybeUser <- apiKeyDao.validate(apiKey)
-        result = maybeUser match {
-          case Some(value) => Right(value)
-          case None => Left(InvalidApiKey)
-        }
-      } yield result
+    ).serverSecurityLogic[AuthedUser, Future] { case (apiKey, maybeIp) =>
+      maybeIp match {
+        case Some(ip) =>
+          for {
+            maybeUser <- apiKeyDao.validate(apiKey, ip)
+            result = maybeUser match {
+              case Some(value) => Right(value)
+              case None => Left(InvalidApiKey)
+            }
+          } yield result
+        case None =>
+          ExceptionUtils.error(InvalidApiKey)
+      }
     }
 
   implicit val jwtClaimCodec: Codec[List[String], JwtClaim, CodecFormat.TextPlain] =
@@ -97,11 +103,11 @@ class JwtAuthProvider(authConfig: AuthConfig,
     serializeClaim(claim)
   }
 
-  override def releaseApiKey(user: User): Future[String] =
-    releaseApiKey(authed(user))
+  override def releaseApiKey(user: User, ip: String): Future[String] =
+    releaseApiKey(authed(user), ip)
 
-  override def releaseApiKey(user: AuthedUser): Future[String] =
-    apiKeyDao.release(user)
+  override def releaseApiKey(user: AuthedUser, ip: String): Future[String] =
+    apiKeyDao.release(user, ip)
 
 }
 object JwtAuthProvider {

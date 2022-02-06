@@ -6,8 +6,8 @@ import scala.concurrent.Future
 
 trait ApiKeyDao {
 
-  def release(authedUser: AuthedUser): Future[String]
+  def release(authedUser: AuthedUser, ip: String): Future[String]
 
-  def validate(key: String): Future[Option[AuthedUser]]
+  def validate(key: String, ip: String): Future[Option[AuthedUser]]
 
 }

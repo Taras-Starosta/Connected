@@ -73,9 +73,10 @@ class AuthController(
       .get
       .description("Get api key")
       .in(basePath / "key")
+      .in(clientIp)
       .out(jsonBody[ApiKey])
-      .serverLogic { u => _ =>
-        authService.apiKey(u)
+      .serverLogic { u => ip =>
+        authService.apiKey(u, ip)
       }
 
 }

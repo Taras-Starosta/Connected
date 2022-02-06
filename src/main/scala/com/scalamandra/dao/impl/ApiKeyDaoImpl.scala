@@ -17,25 +17,33 @@ class ApiKeyDaoImpl(tokenProvider: TokenProvider,
                     authConfig: AuthConfig)
                    (implicit ioRuntime: IORuntime) extends ApiKeyDao {
 
-  implicit val cache: CaffeineCache[IO, String, AuthedUser] = {
+  case class WsSession(user: AuthedUser, ip: String)
+
+  implicit val cache: CaffeineCache[IO, String, WsSession] = {
     val (ttl, unit) = {
       val config = authConfig.apiKeyTtl
       config.length -> config.unit
     }
     val underlying = Caffeine.newBuilder()
       .expireAfterWrite(ttl, unit)
-      .build[String, Entry[AuthedUser]]()
-    CaffeineCache[IO, String, AuthedUser](underlying)
+      .build[String, Entry[WsSession]]()
+    CaffeineCache[IO, String, WsSession](underlying)
   }
 
-  override def release(authedUser: AuthedUser): Future[String] = {
+  override def release(authedUser: AuthedUser, ip: String): Future[String] = {
     val apiKey = tokenProvider.generateToken
-    put(apiKey)(authedUser)
+    val wsSession = WsSession(authedUser, ip)
+    put(apiKey)(wsSession)
       .as(apiKey)
       .unsafeToFuture()
   }
 
-  override def validate(key: String): Future[Option[AuthedUser]] =
-    get(key).unsafeToFuture()
+  override def validate(key: String, ip: String): Future[Option[AuthedUser]] =
+    get(key).map { maybeSession =>
+      for {
+        session <- maybeSession
+        if session.ip == ip
+      } yield session.user
+    }.unsafeToFuture()
 
 }

@@ -82,10 +82,15 @@ class AuthServiceImpl(
     } yield if(success) Right(())
       else Left(ConfirmationNotFound)
 
-  override def apiKey(user: AuthedUser): Future[Either[HttpException, ApiKey]] =
-    for {
-      body <- authProvider.releaseApiKey(user)
-      key = ApiKey(body)
-    } yield Right(key)
+  override def apiKey(user: AuthedUser, maybeIp: Option[String]): Future[Either[HttpException, ApiKey]] =
+    maybeIp match {
+      case Some(ip) =>
+        for {
+          body <- authProvider.releaseApiKey(user, ip)
+          key = ApiKey(body)
+        } yield Right(key)
+      case None =>
+        error(InvalidCredentials)
+    }
 
 }
