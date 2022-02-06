@@ -69,7 +69,8 @@ object Main {
         val mailer = new MailerImpl(emailConfig)
         val tokenProvider = new TokenProviderImpl
         val bCryptProvider = new BCryptProviderImpl(bCryptConfig)
-        val authProvider = new JwtAuthProvider(authConfig)
+        val apiKeyDao = new ApiKeyDaoImpl(tokenProvider, authConfig)
+        val authProvider = new JwtAuthProvider(authConfig, apiKeyDao)
         val authService = new AuthServiceImpl(
           mailer = mailer,
           userDao = userDao,

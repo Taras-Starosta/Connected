@@ -1,5 +1,6 @@
 package com.scalamandra.service
 
+import com.scalamandra.model.HttpException
 import com.scalamandra.model.HttpException.{Conflict, NotFound, Unauthorized}
 import com.scalamandra.model.dto.auth._
 
@@ -14,5 +15,7 @@ trait AuthService extends Service {
   def refresh(authedUser: AuthedUser, request: RefreshRequest): Future[Either[Unauthorized, RefreshResponse]]
 
   def activate(request: ActivationRequest): Future[Either[NotFound, Unit]]
+
+  def apiKey(user: AuthedUser): Future[Either[HttpException, Unit]]
 
 }

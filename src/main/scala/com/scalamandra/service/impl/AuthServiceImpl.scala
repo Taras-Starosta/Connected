@@ -1,6 +1,6 @@
 package com.scalamandra.service.impl
 
-import com.scalamandra.dao.{TokenDao, UserDao}
+import com.scalamandra.dao.{ApiKeyDao, TokenDao, UserDao}
 import com.scalamandra.integration.Mailer
 import com.scalamandra.model.HttpException
 import com.scalamandra.model.HttpException.{ConfirmationNotFound, Conflict, InvalidCredentials, Unauthorized, UserAlreadyExists}
@@ -52,7 +52,7 @@ class AuthServiceImpl(
           val tokenBody = tokenProvider.generateToken
           for {
             refreshToken <- tokenDao.createRefresh(user, tokenBody)
-            authToken = authProvider.releaseAuth(user)
+            authToken <- authProvider.releaseJwt(user)
             response = LoginResponse(
               authToken = authToken,
               refreshToken = refreshToken.body,
@@ -67,10 +67,11 @@ class AuthServiceImpl(
   override def refresh(authedUser: AuthedUser, request: RefreshRequest): Future[Either[Unauthorized, RefreshResponse]] =
     for {
       success <- tokenDao.refresh(authedUser.id, request.refreshToken)
+      jwt <- authProvider.releaseJwt(authedUser)
     } yield if(success) {
       Right(
         RefreshResponse(
-          authProvider.releaseAuth(authedUser)
+          jwt
         )
       )
     } else Left(InvalidCredentials)
@@ -80,5 +81,8 @@ class AuthServiceImpl(
       success <- userDao.activate(request.userId, request.token)
     } yield if(success) Right(())
       else Left(ConfirmationNotFound)
+
+  override def apiKey(user: AuthedUser): Future[Either[HttpException, Unit]] =
+    authProvider.releaseApiKey(user).map(Right(_))
 
 }

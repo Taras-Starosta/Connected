@@ -45,7 +45,7 @@ class AuthController(
       .serverLogic(authService.login)
 
   def refresh: Endpoint =
-    authProvider.authed(
+    authProvider.httpAuthed(
       oneOfHttp(InvalidCredentials)
     ).post
       .description("Refresh jwt session")
@@ -66,5 +66,14 @@ class AuthController(
       )
       .mapInTo[ActivationRequest]
       .serverLogic(authService.activate)
+
+  def apiKey: Endpoint =
+    authProvider.httpAuthed()
+      .get
+      .description("Get api key")
+      .in(basePath / "key")
+      .serverLogic { u => _ =>
+        authService.apiKey(u)
+      }
 
 }

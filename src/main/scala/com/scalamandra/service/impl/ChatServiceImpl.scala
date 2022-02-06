@@ -6,7 +6,7 @@ import akka.http.scaladsl.util.FastFuture
 import akka.stream.FlowShape
 import akka.stream.scaladsl._
 import com.scalamandra.dao.ChatDao
-import com.scalamandra.model.HttpException
+import com.scalamandra.model.WsException
 import com.scalamandra.model.db.ChatEvent._
 import com.scalamandra.model.dto.auth.AuthedUser
 import com.scalamandra.model.dto.chat.ChatProtocol._
@@ -22,7 +22,7 @@ class ChatServiceImpl(chatDao: ChatDao)
 
   def some[T](obj: T): Future[Option[T]] = FastFuture.successful(Some(obj))
 
-  override def handle(user: AuthedUser): Future[Either[HttpException, Flow[ClientMessage, ServerMessage, NotUsed]]] =
+  override def handle(user: AuthedUser): Future[Either[WsException, Flow[ClientMessage, ServerMessage, NotUsed]]] =
     for {
       subscription <- chatDao.subscribe(user)
       serverEvents = subscription.events.map {

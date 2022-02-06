@@ -16,11 +16,11 @@ class ChatController(
                       chatService: ChatService,
                     ) extends Controller {
 
-  override val endpoints: List[Endpoint] = List()
+  override val endpoints: List[Endpoint] = List(chat)
 
   def chat: Endpoint =
-    authProvider.authed()
-      .description("Chat websocket endpoint.")
+    authProvider.wsAuthed()
+      .description("Chat websockets endpoint.")
       .in(version / "chat")
       .out(
         webSocketBody[ClientMessage, CodecFormat.Json, ServerMessage, CodecFormat.Json](AkkaStreams)

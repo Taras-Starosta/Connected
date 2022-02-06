@@ -13,6 +13,7 @@ def doobieDep(module: String): ModuleID = "org.tpolecat" %% s"doobie-$module" % 
 def scribeDep(module: String = ""): ModuleID = "com.outr" %% s"scribe${
   if(module.isBlank) "" else s"-$module"
 }" % "3.6.10"
+def cacheDep(module: String): ModuleID = "com.github.cb372" %% s"scalacache-$module" % "1.0.0-M6"
 
 libraryDependencies ++= Seq(
   akkaDep("actor-typed"),
@@ -35,6 +36,8 @@ libraryDependencies ++= Seq(
   "com.github.daddykotex" %% "courier" % "3.1.0",
   "org.flywaydb" % "flyway-core" % "8.4.3",
   "org.webjars" % "swagger-ui" % "4.4.1-1",
+  cacheDep("core"),
+  cacheDep("caffeine"),
 )
 
 assembly / assemblyJarName := "connected.jar"
