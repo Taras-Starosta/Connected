@@ -51,8 +51,7 @@ class JwtAuthProvider(authConfig: AuthConfig,
 
   override def wsAuthed(errorOut: OneOfVariant[_ <: WsException]*): PartialServerEndpoint[KeyAndIp, AuthedUser, Unit, WsException, Unit, Any, Future] =
     endpoint.securityIn(
-      auth.apiKey(query[String]("key"))
-        .and(clientIp)
+      auth.apiKey(query[String]("key")) and clientIp
     ).errorOut(
       oneOf[WsException](
         ExceptionUtils.oneOfWs(InvalidApiKey),
