@@ -20,7 +20,6 @@ class ChatController(
 
   def chat: Endpoint =
     authProvider.wsAuthed()
-      .post
       .description("Chat websockets endpoint.")
       .in(version / "chat")
       .out(
