@@ -4,7 +4,6 @@ import cats.effect.IO
 import cats.effect.unsafe.IORuntime
 import doobie._
 import doobie.implicits._
-import doobie.util.fragment
 
 import scala.annotation.tailrec
 import scala.concurrent.Future

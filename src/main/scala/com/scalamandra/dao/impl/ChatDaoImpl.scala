@@ -12,11 +12,11 @@ import com.scalamandra.dao.ChatDao
 import com.scalamandra.dao.ChatDao.ChatSubscription
 import com.scalamandra.dao.impl.ChatDaoImpl._
 import com.scalamandra.model.db.ChatEvent._
-import com.scalamandra.model.db.{ChatEvent, Message, User}
+import com.scalamandra.model.db.{ChatEvent, Message}
 import com.scalamandra.model.dto.auth.AuthedUser
 import com.scalamandra.provider.TokenProvider
 
-import java.time.{Clock, ZonedDateTime}
+import java.time.{Clock, Instant}
 import scala.concurrent.{ExecutionContext, Future}
 
 class ChatDaoImpl(actor: ActorRef[ChatCommand],
@@ -33,7 +33,7 @@ class ChatDaoImpl(actor: ActorRef[ChatCommand],
       id = tokenProvider.generateToken,
       payload = payload,
       author = author.id,
-      timestamp = ZonedDateTime.now(clock)
+      timestamp = Instant.now(clock)
     )
     actor ! AddMessage(message)
     Future.unit

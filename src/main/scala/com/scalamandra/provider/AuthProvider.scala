@@ -1,8 +1,8 @@
 package com.scalamandra.provider
 
-import com.scalamandra.model.{HttpException, WsException}
 import com.scalamandra.model.db.User
 import com.scalamandra.model.dto.auth.AuthedUser
+import com.scalamandra.model.{HttpException, WsException}
 import sttp.tapir.EndpointOutput.OneOfVariant
 import sttp.tapir.server.PartialServerEndpoint
 

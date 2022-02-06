@@ -1,5 +1,7 @@
 package com.scalamandra
 
+import java.time.Instant
+
 package object serialization extends upickle.AttributeTagged {
 
   override implicit def OptionWriter[T: Writer]: Writer[Option[T]] =
@@ -13,5 +15,11 @@ package object serialization extends upickle.AttributeTagged {
       override def visitNull(index: Int) = None
     }
   }
+
+  implicit val instant: ReadWriter[Instant] =
+    readwriter[String].bimap(
+      time => time.toString,
+      text => Instant.parse(text),
+    )
 
 }

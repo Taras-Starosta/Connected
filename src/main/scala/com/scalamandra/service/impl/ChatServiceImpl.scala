@@ -39,7 +39,7 @@ class ChatServiceImpl(chatDao: ChatDao)
         import GraphDSL.Implicits._
         val server = builder.add(Merge[ServerMessage](2))
         val client = builder.add(Flow[ClientMessage])
-        serverEvents ~> server.in
+        serverEvents ~> server.in(0)
 
         client.mapAsync(1) {
           case Join =>
@@ -56,7 +56,7 @@ class ChatServiceImpl(chatDao: ChatDao)
             none(_.removeMessage(id, user))
         }.collect {
           case Some(response) => response
-        } ~> server.in
+        } ~> server.in(1)
 
         FlowShape(client.in, server.out)
       })

@@ -7,8 +7,8 @@ import com.scalamandra.config.AuthConfig
 import com.scalamandra.dao.ApiKeyDao
 import com.scalamandra.model.dto.auth.AuthedUser
 import com.scalamandra.provider.TokenProvider
-import scalacache._
 import scalacache.Flags.defaultFlags
+import scalacache._
 import scalacache.caffeine._
 
 import scala.concurrent.Future

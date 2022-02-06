@@ -1,10 +1,17 @@
 package com.scalamandra.model.db
 
-import java.time.ZonedDateTime
+import com.scalamandra.serialization._
+
+import java.time.Instant
 
 case class Message(
                     id: String,
                     payload: String,
                     author: Long,
-                    timestamp: ZonedDateTime,
+                    timestamp: Instant,
                   )
+object Message {
+
+  implicit val readWriter: ReadWriter[Message] = macroRW[Message]
+
+}

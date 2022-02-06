@@ -72,6 +72,7 @@ class AuthController(
       .get
       .description("Get api key")
       .in(basePath / "key")
+      .out(jsonBody[ApiKey])
       .serverLogic { u => _ =>
         authService.apiKey(u)
       }

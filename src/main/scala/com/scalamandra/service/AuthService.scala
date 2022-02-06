@@ -16,6 +16,6 @@ trait AuthService extends Service {
 
   def activate(request: ActivationRequest): Future[Either[NotFound, Unit]]
 
-  def apiKey(user: AuthedUser): Future[Either[HttpException, Unit]]
+  def apiKey(user: AuthedUser): Future[Either[HttpException, ApiKey]]
 
 }

@@ -1,11 +1,10 @@
 package com.scalamandra.config
 
 import akka.util.Timeout
-
-import scala.concurrent.duration.FiniteDuration
-
 import pureconfig.ConfigReader
 import pureconfig.generic.semiauto._
+
+import scala.concurrent.duration.FiniteDuration
 
 case class ChatConfig(
                        responseTimeout: FiniteDuration,

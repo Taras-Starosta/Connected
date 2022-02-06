@@ -1,6 +1,6 @@
 package com.scalamandra.service.impl
 
-import com.scalamandra.dao.{ApiKeyDao, TokenDao, UserDao}
+import com.scalamandra.dao.{TokenDao, UserDao}
 import com.scalamandra.integration.Mailer
 import com.scalamandra.model.HttpException
 import com.scalamandra.model.HttpException.{ConfirmationNotFound, Conflict, InvalidCredentials, Unauthorized, UserAlreadyExists}
@@ -82,7 +82,10 @@ class AuthServiceImpl(
     } yield if(success) Right(())
       else Left(ConfirmationNotFound)
 
-  override def apiKey(user: AuthedUser): Future[Either[HttpException, Unit]] =
-    authProvider.releaseApiKey(user).map(Right(_))
+  override def apiKey(user: AuthedUser): Future[Either[HttpException, ApiKey]] =
+    for {
+      body <- authProvider.releaseApiKey(user)
+      key = ApiKey(body)
+    } yield Right(key)
 
 }
